@@ -1,0 +1,208 @@
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(stringr)
+library(readr)
+library(fastDummies)
+library(broom)
+
+source("pct_cleaning.R") #cleaning and prepping census data for precincts
+
+source("ccrb_cleaning.R") #cleaning and prepping CCRB complaint data
+
+#-----Regression specifications!--------------
+citywide_reg <- lm(log(comp_rate_p100k) ~ lag(subst_rate, 1) + lag(trunc_rate, 1) + rec_yr + adams, 
+                   data = citywide_stat2)
+summary(citywide_reg) 
+
+city1_results <- tidy(citywide_reg) %>% 
+  filter(term != "(Intercept)") %>% 
+  mutate(significance = ifelse(p.value < 0.05, "Significant", "Not Significant"))
+
+city1_results
+
+city1_coefs <- ggplot(city1_results) +
+  geom_col(aes(x = term, y = estimate, fill = significance)) +
+  labs(
+    title = "Citywide Regression Results",
+    x = "term",
+    y = "coefficient",
+  ) +
+  theme_minimal()+
+  scale_fill_manual(values = c("Signficant" = "#0072B2", "Not Significant" =  "#CC79A7"))
+
+city1_coefs
+
+citywide_reg2 <- lm(log(comp_count) ~ lag(subst_count, 1) + lag(trunc_count, 1) + rec_yr + adams,
+                    data = citywide_stat2)
+summary(citywide_reg2)
+#B(lag(subst_rate)) = 0.132 - 0.05 significant effect of prior year substantiations
+#but assoc. with INCREASED complaint rate!
+#possibly due to reporting effects?
+#Adj R2 = 0.96
+
+city2_results <- tidy(citwyide_reg2) %>% 
+  filter(term != "(Intercept)") %>% 
+  mutate(significance = ifelse(p.value < 0.05, "Significant", "Not Significant"))
+
+city2_results
+
+#both demographics and precincts
+both_reg <- lm(log(comp_rate_p100k) ~ lag(subst_rate, 1) + lag(trunc_rate, 1) + rec_yr + adams + precinct + rec_yr:precinct +
+                 share_nhwh + share_nhbl + share_hisp + share_asian + share_bir,
+               data = ccrb_comps_pc)
+summary(both_reg)
+#can't reg demographics and precincts at the same time - too closely correlated!
+
+#regression by demographic characteristics
+demo_reg <- lm(log(comp_rate_p100k) ~ lag(subst_rate, 1) + lag(trunc_rate, 1) + rec_yr +adams + 
+                 share_nhwh + share_nhbl + share_hisp + share_asian + share_bir, 
+               data = ccrb_comps_pc)
+summary(demo_reg) #Adjusted R-squared = .264 - B(subst) = +1.865
+
+demoreg_results <- tidy(demo_reg) %>% 
+  filter(term != "(Intercept)") %>% 
+  mutate(significance = ifelse(p.value < 0.05, "Significant", "Not Significant"))
+
+demoreg_results
+
+#regression by precinct - certain ones stick out
+pct_reg <- lm(log(comp_count) ~ lag(subst_rate, 1) + lag(trunc_rate, 1) + precinct + rec_yr +rec_yr:precinct + adams, data = ccrb_comps_pc)
+
+summary(pct_reg) #Adjusted R-squared = .2331 - much stronger, catching other effects too, like poverty, crime
+#B(subst) = +2.277
+
+pctreg_results <- tidy(pct_reg) %>% 
+  filter(term != "(Intercept)") %>% 
+  mutate(significance = ifelse(p.value < 0.05, "Significant", "Not Significant"))
+
+pctreg_results
+
+pct_reg2 <- lm(log(comp_count) ~ lag(subst_count, 1) + lag(trunc_count, 1) + precinct + rec_yr +rec_yr:precinct + adams + pct_pop, data = ccrb_comps_pc)
+
+summary(pct_reg2)
+
+pctreg2_results <- tidy(pct_reg2) %>% 
+  filter(term != "(Intercept)") %>% 
+  mutate(significance = ifelse(p.value < 0.05, "Significant", "Not Significant"))
+
+pctreg2_results
+
+#separating out borough effects
+bor_reg <- lm(log(comp_rate_p100k) ~ lag(subst_rate, 1) + lag(trunc_rate, 1) + rec_yr + adams + boro + boro:rec_yr
+              , data = ccrb_comps_pc)
+summary(bor_reg) #Looks like strong borough effects, but... (B(subst) = +0.015) (r2 =0.03)
+
+bor_results <- tidy(bor_reg) %>% 
+  filter(term != "(Intercept)") %>% 
+  mutate(significance = ifelse(p.value < 0.05, "Significant", "Not Significant"))
+
+bor_results
+
+pctbor_reg <- lm(log(comp_rate_p100k) ~ lag(subst_rate, 1) + lag(trunc_rate, 1) + rec_yr + adams
+              + precinct + boro+ rec_yr:precinct + rec_yr:boro
+              , data = ccrb_comps_pc)
+summary(pctbor_reg) #...insignificant when precincts are factored in (B(subst) = 2.394), R2 = 0.3
+
+pctbor_results <- tidy(pctbor_reg) %>% 
+  filter(term != "(Intercept)") %>% 
+  mutate(significance = ifelse(p.value < 0.05, "Significant", "Not Significant"))
+
+pctbor_results
+#---------Plots!---------
+
+citywide_area<- ggplot(citywide_stat2) +
+  geom_area(aes(x = rec_yr, y = comp_count, fill = comp_count)) +
+  labs(
+    title = "Complaints dropped until 2021, then rise",
+    subtitle = "citywide complaints 100k residents, 2017-2024ytd",
+    x = "year",
+    y = "complaints",
+    caption = "source: https://data.cityofnewyork.us/Public-Safety/Civilian-Complaint-Review-Board-Complaints-Against/2mby-ccnw/about_data"
+  ) +
+  theme_minimal()
+citywide_area
+
+
+subst_line <- ggplot(citywide_stat2) +
+  geom_line(aes(x = rec_yr, y = subst_count)) +
+  labs(
+    title = "Complaints dropped until 2021, then rise",
+    subtitle = "citywide substantiated complaints, 2017-2024ytd",
+    x = "year",
+    y = "substantiations",
+    caption = "source: https://data.cityofnewyork.us/Public-Safety/Civilian-Complaint-Review-Board-Complaints-Against/2mby-ccnw/about_data"
+  ) +
+  geom_line(aes(x = rec_yr, y = comp_count)) +
+  geom_line(aes(x = rec_yr, y = trunc_count)) +
+  theme_minimal()
+subst_line
+
+#allegation based charts
+good_pallette <- c("#0072B2", "#009E73", "#CC79A7", "#D55E00",  "#F0E442")
+
+c_a_area <- ggplot(c_a_wrap2) +
+  geom_area(aes(x = rec_yr, y = alleg_count, fill = disp_cat))+
+  labs(
+    title = "Many Complaints Aren't Fully Investigated",
+    subtitle = "Broad dispositions over time, 2017-23",
+    x = "year",
+    y = "# of allegations",
+    fill = "Investigation Results",
+    caption = "source: 
+    https://data.cityofnewyork.us/Public-Safety/Civilian-Complaint-Review-Board-Allegations-Agains/6xgr-kwjq/about_data"
+  ) +
+  scale_fill_manual(values = good_pallette)+
+  theme_minimal()
+c_a_area
+ggsave("c_a_area.png")
+
+c_a_area_fac <- ggplot(c_a_wrap3) +
+  geom_area(aes(x = rec_yr, y = alleg_count, fill = disp_cat))+
+  labs(
+    title = "Many Complaints Aren't Fully Investigated",
+    subtitle = "Broad dispositions over time, 2017-24",
+    x = "year",
+    y = "# of allegations",
+    fill = "Investigation Results",
+    caption = "source: 
+    https://data.cityofnewyork.us/Public-Safety/Civilian-Complaint-Review-Board-Allegations-Agains/6xgr-kwjq/about_data"
+  ) +
+  scale_fill_manual(values = good_pallette)+
+  theme_minimal() +
+  facet_wrap(~type, ncol = 2)
+c_a_area_fac
+ggsave("c_a_area_fac.png")
+
+c_a_sharea <- ggplot(c_a_wrap2) +
+  geom_area(aes(x = rec_yr, y = cat_share, fill = disp_cat))+
+  labs(
+    title = "Many Complaints Aren't Fully Investigated",
+    subtitle = "Broad dispositions over time, 2017-23",
+    x = "year",
+    y = "% of allegations",
+    fill = "Investigation Results",
+    caption = "source: 
+    https://data.cityofnewyork.us/Public-Safety/Civilian-Complaint-Review-Board-Allegations-Agains/6xgr-kwjq/about_data"
+  ) +
+  scale_fill_manual(values = good_pallette)+
+  theme_minimal()
+c_a_sharea
+ggsave("c_a_sharea.png")
+
+c_a_sharea_fac <- ggplot(c_a_wrap4) +
+  geom_area(aes(x = rec_yr, y = cat_share, fill = disp_cat))+
+  labs(
+    title = "Many Complaints Aren't Fully Investigated",
+    subtitle = "Broad dispositions over time, 2017-23",
+    x = "year",
+    y = "% of allegations",
+    fill = "Investigation Results",
+    caption = "source: 
+    https://data.cityofnewyork.us/Public-Safety/Civilian-Complaint-Review-Board-Allegations-Agains/6xgr-kwjq/about_data"
+  ) +
+  scale_fill_manual(values = good_pallette)+
+  theme_minimal() +
+  facet_wrap(~type, ncol = 2)
+c_a_sharea_fac
+ggsave("c_a_sharea_fac.png")

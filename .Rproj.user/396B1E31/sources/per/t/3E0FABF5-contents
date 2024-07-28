@@ -25,7 +25,7 @@ ccrb_comp_cleanv2 <- ccrb_comp_cleanv1 %>%
   mutate(rec_dt = mdy_hms(rec_date))
 
 ccrb_comp_cleanv3 <- ccrb_comp_cleanv2 %>%
-  filter(rec_dt > as.Date('2017-01-01'), 
+  filter(rec_dt > as.Date('2017-01-01'),
          !is.na(precinct), 
          precinct != "", 
          precinct != "Precinct 0", 
@@ -41,15 +41,24 @@ ccrb_comps <- ccrb_comp_cleanv3 %>%
     disp == "Complainant Uncooperative" |
       disp == "Complainant Unavailable" | 
       disp == "Complaint Withdrawn" |
-      disp == "Closed - Pending Litigation", 1, 0),
+      disp == "Closed - Pending Litigation" |
+      disp == "Victim Unidentified" |
+      disp == "Officer(s) Unidentified" |
+      disp == "Alleged Victim Unavailable" |
+      disp == "Alleged Victim Uncooperative" |
+      disp == "Witness Unavailable" |
+      disp == "Witness Uncooperative", 1, 0),
     subst = if_else(
       disp == "Substantiated (Command Discipline A)" |
         disp == "Substantiated (Command Discipline B)" |
         disp == "Substantiated (Command Lvl Instructions)" |
-        disp == "Substantiated (Formalized Training)", 1, 0),
+        disp == "Substantiated (Formalized Training)"|
+        disp == "Substantiated (Charges)", 1, 0),
     rec_yr = year(rec_dt),
-    adams = if_else(rec_yr > 2021, 1, 0)
-  ) #Year helpful, but covers multiple administrations "adams" can isolate that effect
+    adams = if_else(rec_yr > 2021, 1, 0) #Year helpful, but covers multiple administrations "adams" can isolate that effect
+  ) %>% 
+  filter(rec_yr < 2024) #removing 2024 to prevent partial year from skewing
+
 
 ccrb_comps_dum <- ccrb_comps %>% 
   dummy_cols(select_columns = c("precinct", "rec_yr", "boro"))
@@ -96,16 +105,74 @@ alleg_raw <- read.csv("Civilian_Complaint_Review_Board__Allegations_Against_Poli
          alleg = Allegation, 
          ccrb_disp = CCRB.Allegation.Disposition, 
          nypd_disp = NYPD.Allegation.Disposition) %>% 
-  select(comp_id, type, alleg, ccrb_disp, nypd_disp) %>% 
+  select(comp_id, type, alleg, ccrb_disp) %>% 
   filter(comp_id >= 201700000)
 
+
+write.csv(alleg_raw, "alleg_raw.csv")
+
+#Too many disposition categories to reasonably plot - let's consolidate
+alleg_prep <- alleg_raw %>% 
+  mutate(disp_cat = case_match(
+    ccrb_disp,
+    c("Complainant Uncooperative", 
+      "Complainant Unavailable", 
+      "Complaint Withdrawn", 
+      "Closed - Pending Litigation",
+      "Victim Unidentified",
+      "Officer(s) Unidentified",
+      "Alleged Victim Unavailable",
+      "Alleged Victim Uncooperative",
+      "Witness Unavailable",
+      "Witness Uncooperative",
+      "OMB PEG Directive Closure") ~ "truncated",
+    c("Substantiated (Command Discipline A)",
+      "Substantiated (Command Discipline B)",
+      "Substantiated (Command Lvl Instructions)",
+      "Substantiated (Formalized Training)",
+      "Substantiated (Charges)") ~ "substantiated",
+    c("Miscellaneous",
+      "Miscellaneous - Subject Resigned",
+      "Miscellaneous - Subject Retired",
+      "Miscellaneous - Subject Terminated") ~ "moot",
+    c("Exonerated",
+      "Unfounded",
+      "Within NYPD Guidelines") ~ "cleared",
+    c("Unable to Determine",
+      "Unsubstantiated") ~ "uncertain"
+  ))
+
+#prepping for the join
 comp_alleg_prep <- ccrb_comps %>% 
-  select(comp_id, precinct, boro, rec_yr)
+  select(comp_id, precinct, boro, rec_yr, subst, truncated)
 
-comp_alleg_join <- left_join(alleg_raw, comp_alleg_prep, by = "comp_id")
+comp_alleg_join <- left_join(alleg_prep, comp_alleg_prep, by = "comp_id") %>% 
+  filter(!is.na(rec_yr), rec_yr != 2024)
+#dropping 2024 since as a partial year it skewed the data pretty badly
 
-comp_alleg_group <- comp_alleg_join %>% 
-  
+#prep for combined graph + shares
+c_a_wrap2 <- comp_alleg_join %>% 
+  group_by(rec_yr, disp_cat) %>% 
+  summarise(alleg_count = n()) %>% 
+  mutate(cat_share = alleg_count/sum(alleg_count) * 100)
+
+#prep for faceted graph
+c_a_wrap3 <- comp_alleg_join %>% 
+  filter(type != "Untruthful Statement") %>% 
+  group_by(rec_yr, disp_cat, type) %>% 
+  summarise(alleg_count = n())
+
+#prep for faceted share graph
+c_a_wrap4 <- comp_alleg_join %>% 
+  filter(type != "Untruthful Statement") %>% 
+  group_by(rec_yr,  type, disp_cat) %>% 
+  summarise(alleg_count = n()) %>% 
+  mutate(cat_share = alleg_count/sum(alleg_count) * 100)
+
+write.csv(c_a_wrap, "c_a_wrap.csv")
+write.csv(c_a_wrap2, "c_a_wrap2.csv")
+write.csv(c_a_wrap3, "c_a_wrap3.csv")
+
 
 #Cleaning for various datawrapper charts
 pct_stats_v3 <- pct_stats_v2 %>% 
@@ -123,3 +190,19 @@ pct_plot_v4 <- left_join(pct_plot_v3, pct_stats_v3, by = "precinct") %>%
   mutate(comp_rate_p100k = comp_count/8800000 * 100000) %>% 
   select(precinct, trunc_rate, subst_rate, comp_rate_p100k, share_bl)
 write.csv(pct_plot_v4, "pct_plot_v4.csv")
+
+
+#Quick Penalty Match Check - 
+#making sure ACLU trend here (https://www.nyclu.org/uploads/2021/12/nyclu-2021-ccrbdata-report.pdf)
+#not overwhelmingly driven by years prior to my analysis
+penalties <- read.csv("Civilian_Complaint_Review_Board__Penalties_20240727.csv") %>% 
+  rename(comp_id = Complaint.Id,
+         ccrb_disp = CCRB.Substantiated.Officer.Disposition,
+         nypd_disp = NYPD.Officer.Penalty) %>% 
+  select(comp_id, ccrb_disp, nypd_disp) %>% 
+  filter(comp_id >= 201700000, nypd_disp != "") %>% 
+  mutate(nopen = ifelse(nypd_disp == "No penalty", 1, 0)) %>% 
+  group_by(ccrb_disp) %>% 
+  summarise(mean(nopen))
+#Not quite as bad as before, but still bad
+
