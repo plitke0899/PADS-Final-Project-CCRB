@@ -5,3 +5,4 @@ You can find a companion article I wrote about my findings here:https://medium.c
 The code comments should be sufficient to explain what is happening, but if you run into problems on reg_and_plot, run the cleaning documents separately first. I don't know why, but this always fixes any issues.
 Besides that, it should run from scratch fine.
 Please feel free to contact me if you have any questions!
+-Patrick
