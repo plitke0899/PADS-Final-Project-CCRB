@@ -34,7 +34,7 @@ ccrb_comp_cleanv3 <- ccrb_comp_cleanv2 %>%
          boro != "",
          boro != "Outside NYC")
 
-#binary-ifying dispositions of interest so I can analyze them numerically
+#Categorizing dispositions of interest so I can analyze them numerically
 ccrb_comps <- ccrb_comp_cleanv3 %>% 
   select(comp_id, precinct, boro, disp, rec_dt) %>% 
   mutate(truncated = if_else(
@@ -57,8 +57,11 @@ ccrb_comps <- ccrb_comp_cleanv3 %>%
     rec_yr = year(rec_dt),
     adams = if_else(rec_yr > 2021, 1, 0) #Year helpful, but covers multiple administrations "adams" can isolate that effect
   ) %>% 
-  filter(rec_yr < 2024) #removing 2024 to prevent partial year from skewing
-
+  filter(rec_yr < 2024) %>% #removing 2024 to prevent partial year from skewing
+  mutate(citypop = if_else(
+    rec_yr > 2020, 8300000, 8800000)) 
+#2020 Census data (aggregated from precincts) for <= 2020, average years after to ~8.3m accounting for likely population decline
+#source:https://www.nyc.gov/assets/planning/download/pdf/planning-level/nyc-population/population-estimates/current-population-estimates-2023-June2024-release.pdf?r=1
 
 ccrb_comps_dum <- ccrb_comps %>% 
   dummy_cols(select_columns = c("precinct", "rec_yr", "boro"))
@@ -84,7 +87,7 @@ ccrb_comps_pc <- ccrb_pct_join %>%
 #un/regrouping the stats to do a citywide regression
 
 citywide_stat1 <- ccrb_comps %>% 
-  group_by(rec_yr, adams) %>% 
+  group_by(rec_yr, adams, citypop) %>% 
   summarize(trunc_rate = mean(truncated)*100,
             subst_rate = mean(subst)*100,
             subst_count = sum(subst),
@@ -94,7 +97,7 @@ citywide_stat1 <- ccrb_comps %>%
             comp_count = n())
 
 citywide_stat2 <- citywide_stat1 %>% 
-  mutate(comp_rate_p100k = comp_count/8800000 * 100000)
+  mutate(comp_rate_p100k = comp_count/citypop * 100000)
 
 write.csv(citywide_stat2, "citywide_stats.csv")
 
@@ -169,27 +172,20 @@ c_a_wrap4 <- comp_alleg_join %>%
   summarise(alleg_count = n()) %>% 
   mutate(cat_share = alleg_count/sum(alleg_count) * 100)
 
-write.csv(c_a_wrap, "c_a_wrap.csv")
+#for the overall graph
+comp_alleg_graphprep1 <- comp_alleg_prep %>% 
+  group_by(rec_yr) %>% 
+  summarize(comp_count = n())
+
+comp_alleg_graphprep2 <- comp_alleg_join %>% 
+  filter(type != "Untruthful Statement") %>% 
+  group_by(rec_yr) %>% 
+  summarise(alleg_count = n())
+
+overall_count <- left_join(comp_alleg_graphprep1, comp_alleg_graphprep2, by = "rec_yr")
+
 write.csv(c_a_wrap2, "c_a_wrap2.csv")
 write.csv(c_a_wrap3, "c_a_wrap3.csv")
-
-
-#Cleaning for various datawrapper charts
-pct_stats_v3 <- pct_stats_v2 %>% 
-  filter(precinct != "121")
-
-pct_plot_v3 <- ccrb_comps_dum %>%
-  group_by(precinct) %>% 
-  summarize(trunc_rate = mean(truncated)*100,
-            subst_rate = mean(subst)*100,
-            subst_count = sum(subst),
-            trunc_count = sum(truncated),
-            comp_count = n())
-
-pct_plot_v4 <- left_join(pct_plot_v3, pct_stats_v3, by = "precinct") %>%
-  mutate(comp_rate_p100k = comp_count/8800000 * 100000) %>% 
-  select(precinct, trunc_rate, subst_rate, comp_rate_p100k, share_bl)
-write.csv(pct_plot_v4, "pct_plot_v4.csv")
 
 
 #Quick Penalty Match Check - 
@@ -203,6 +199,13 @@ penalties <- read.csv("Civilian_Complaint_Review_Board__Penalties_20240727.csv")
   filter(comp_id >= 201700000, nypd_disp != "") %>% 
   mutate(nopen = ifelse(nypd_disp == "No penalty", 1, 0)) %>% 
   group_by(ccrb_disp) %>% 
-  summarise(mean(nopen))
+  summarise(pct_nopen = mean(nopen)*100) %>% 
+  mutate(labels = case_when(
+    ccrb_disp == "Substantiated (Charges)" ~ "Charges",
+    ccrb_disp == "Substantiated (Command Discipline A)" ~ "Cmd Disc. A",
+    ccrb_disp == "Substantiated (Command Discipline B)" ~ "Cmd Disc. B",
+    ccrb_disp == "Substantiated (Command Lvl Instructions)" ~ "Cmd Lvl Instr.",
+    ccrb_disp == "Substantiated (Formalized Training)" ~ "Training"
+  ))
 #Not quite as bad as before, but still bad
 

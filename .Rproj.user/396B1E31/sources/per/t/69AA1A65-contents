@@ -9,101 +9,67 @@ library(broom)
 source("pct_cleaning.R") #cleaning and prepping census data for precincts
 
 source("ccrb_cleaning.R") #cleaning and prepping CCRB complaint data
+#note: run file directly rather than sourcing; if I try to run this
+#whole file at once it gets ahead of itself and faults
 
-#-----Regression specifications!--------------
+#-----Regression specifications & Coefficient Extraction--------------
+#make sure to run regression and coefficient extraction together
+#so the coefficient will extract from the most recent version
+#1. Citywide, Complaints per capita
 citywide_reg <- lm(log(comp_rate_p100k) ~ lag(subst_rate, 1) + lag(trunc_rate, 1) + rec_yr + adams, 
                    data = citywide_stat2)
 summary(citywide_reg) 
-
-city1_results <- tidy(citywide_reg) %>% 
+city1_results <- tidy(citywide_reg) %>% #coefficient extraction for charts
   filter(term != "(Intercept)") %>% 
   mutate(significance = ifelse(p.value < 0.05, "Significant", "Not Significant"))
-
 city1_results
+#no significant coefficients, and R2 of 0.643
 
-city1_coefs <- ggplot(city1_results) +
-  geom_col(aes(x = term, y = estimate, fill = significance)) +
-  labs(
-    title = "Citywide Regression Results",
-    x = "term",
-    y = "coefficient",
-  ) +
-  theme_minimal()+
-  scale_fill_manual(values = c("Signficant" = "#0072B2", "Not Significant" =  "#CC79A7"))
-
-city1_coefs
-
-citywide_reg2 <- lm(log(comp_count) ~ lag(subst_count, 1) + lag(trunc_count, 1) + rec_yr + adams,
-                    data = citywide_stat2)
-summary(citywide_reg2)
-#B(lag(subst_rate)) = 0.132 - 0.05 significant effect of prior year substantiations
-#but assoc. with INCREASED complaint rate!
-#possibly due to reporting effects?
-#Adj R2 = 0.96
-
-city2_results <- tidy(citwyide_reg2) %>% 
-  filter(term != "(Intercept)") %>% 
-  mutate(significance = ifelse(p.value < 0.05, "Significant", "Not Significant"))
-
-city2_results
-
-#both demographics and precincts
+#3. both demographics and precincts
 both_reg <- lm(log(comp_rate_p100k) ~ lag(subst_rate, 1) + lag(trunc_rate, 1) + rec_yr + adams + precinct + rec_yr:precinct +
                  share_nhwh + share_nhbl + share_hisp + share_asian + share_bir,
                data = ccrb_comps_pc)
 summary(both_reg)
+both_results <- tidy(both_reg) %>% 
+  filter(term != "(Intercept)") %>% 
+  mutate(significance = ifelse(p.value < 0.05, "Significant", "Not Significant"))
+both_results
 #can't reg demographics and precincts at the same time - too closely correlated!
 
-#regression by demographic characteristics
+#4. regression by demographic characteristics
 demo_reg <- lm(log(comp_rate_p100k) ~ lag(subst_rate, 1) + lag(trunc_rate, 1) + rec_yr +adams + 
                  share_nhwh + share_nhbl + share_hisp + share_asian + share_bir, 
                data = ccrb_comps_pc)
 summary(demo_reg) #Adjusted R-squared = .264 - B(subst) = +1.865
-
-demoreg_results <- tidy(demo_reg) %>% 
+demo_results <- tidy(demo_reg) %>% 
   filter(term != "(Intercept)") %>% 
   mutate(significance = ifelse(p.value < 0.05, "Significant", "Not Significant"))
+demo_results
 
-demoreg_results
-
-#regression by precinct - certain ones stick out
-pct_reg <- lm(log(comp_count) ~ lag(subst_rate, 1) + lag(trunc_rate, 1) + precinct + rec_yr +rec_yr:precinct + adams, data = ccrb_comps_pc)
-
-summary(pct_reg) #Adjusted R-squared = .2331 - much stronger, catching other effects too, like poverty, crime
-#B(subst) = +2.277
-
+#5. regression by precinct - certain ones stick out
+pct_reg <- lm(log(comp_rate_p100k) ~ lag(subst_rate, 1) + lag(trunc_rate, 1) + precinct + rec_yr +rec_yr:precinct + adams,
+              data = ccrb_comps_pc)
+summary(pct_reg)
 pctreg_results <- tidy(pct_reg) %>% 
   filter(term != "(Intercept)") %>% 
   mutate(significance = ifelse(p.value < 0.05, "Significant", "Not Significant"))
-
 pctreg_results
 
-pct_reg2 <- lm(log(comp_count) ~ lag(subst_count, 1) + lag(trunc_count, 1) + precinct + rec_yr +rec_yr:precinct + adams + pct_pop, data = ccrb_comps_pc)
 
-summary(pct_reg2)
-
-pctreg2_results <- tidy(pct_reg2) %>% 
-  filter(term != "(Intercept)") %>% 
-  mutate(significance = ifelse(p.value < 0.05, "Significant", "Not Significant"))
-
-pctreg2_results
-
-#separating out borough effects
+#6. separating out borough effects
 bor_reg <- lm(log(comp_rate_p100k) ~ lag(subst_rate, 1) + lag(trunc_rate, 1) + rec_yr + adams + boro + boro:rec_yr
               , data = ccrb_comps_pc)
 summary(bor_reg) #Looks like strong borough effects, but... (B(subst) = +0.015) (r2 =0.03)
-
 bor_results <- tidy(bor_reg) %>% 
   filter(term != "(Intercept)") %>% 
   mutate(significance = ifelse(p.value < 0.05, "Significant", "Not Significant"))
-
 bor_results
 
+#7. Precinct and Borough
 pctbor_reg <- lm(log(comp_rate_p100k) ~ lag(subst_rate, 1) + lag(trunc_rate, 1) + rec_yr + adams
               + precinct + boro+ rec_yr:precinct + rec_yr:boro
               , data = ccrb_comps_pc)
 summary(pctbor_reg) #...insignificant when precincts are factored in (B(subst) = 2.394), R2 = 0.3
-
 pctbor_results <- tidy(pctbor_reg) %>% 
   filter(term != "(Intercept)") %>% 
   mutate(significance = ifelse(p.value < 0.05, "Significant", "Not Significant"))
@@ -111,32 +77,32 @@ pctbor_results <- tidy(pctbor_reg) %>%
 pctbor_results
 #---------Plots!---------
 
-citywide_area<- ggplot(citywide_stat2) +
-  geom_area(aes(x = rec_yr, y = comp_count, fill = comp_count)) +
+citywide_totals<- ggplot(overall_count) +
+  geom_area(aes(x = rec_yr, y = alleg_count), fill = "#D55E00") +
+  geom_area(aes(x = rec_yr, y = comp_count), fill = "#0072B2") +
   labs(
     title = "Complaints dropped until 2021, then rise",
-    subtitle = "citywide complaints 100k residents, 2017-2024ytd",
+    subtitle = "Allegations are more volatile throughout",
     x = "year",
     y = "complaints",
     caption = "source: https://data.cityofnewyork.us/Public-Safety/Civilian-Complaint-Review-Board-Complaints-Against/2mby-ccnw/about_data"
   ) +
   theme_minimal()
-citywide_area
+citywide_totals
+ggsave("citywide_totals.png")
 
-
-subst_line <- ggplot(citywide_stat2) +
-  geom_line(aes(x = rec_yr, y = subst_count)) +
+#penalty chart
+penalty_chart <- ggplot(penalties) +
+  geom_col(aes(x = labels, y = pct_nopen), fill = "steelblue") +
   labs(
-    title = "Complaints dropped until 2021, then rise",
-    subtitle = "citywide substantiated complaints, 2017-2024ytd",
-    x = "year",
-    y = "substantiations",
-    caption = "source: https://data.cityofnewyork.us/Public-Safety/Civilian-Complaint-Review-Board-Complaints-Against/2mby-ccnw/about_data"
+    title = "Many substantiated complaints see no discipline",
+    subtitle = "Avg % of subst. allegations with no penalty, 2017-23",
+    x = "Substantiation Severity",
+    y = "Percent with no penalty",
   ) +
-  geom_line(aes(x = rec_yr, y = comp_count)) +
-  geom_line(aes(x = rec_yr, y = trunc_count)) +
   theme_minimal()
-subst_line
+penalty_chart
+ggsave("penalty_chart.png")
 
 #allegation based charts
 good_pallette <- c("#0072B2", "#009E73", "#CC79A7", "#D55E00",  "#F0E442")
@@ -160,8 +126,8 @@ ggsave("c_a_area.png")
 c_a_area_fac <- ggplot(c_a_wrap3) +
   geom_area(aes(x = rec_yr, y = alleg_count, fill = disp_cat))+
   labs(
-    title = "Many Complaints Aren't Fully Investigated",
-    subtitle = "Broad dispositions over time, 2017-24",
+    title = "Force and Abuse Allegation See Largest Surge",
+    subtitle = "Broad dispositions over time, 2017-23",
     x = "year",
     y = "# of allegations",
     fill = "Investigation Results",
@@ -193,7 +159,7 @@ ggsave("c_a_sharea.png")
 c_a_sharea_fac <- ggplot(c_a_wrap4) +
   geom_area(aes(x = rec_yr, y = cat_share, fill = disp_cat))+
   labs(
-    title = "Many Complaints Aren't Fully Investigated",
+    title = "Force and Abuse Allegation See Largest Surge",
     subtitle = "Broad dispositions over time, 2017-23",
     x = "year",
     y = "% of allegations",
@@ -206,3 +172,82 @@ c_a_sharea_fac <- ggplot(c_a_wrap4) +
   facet_wrap(~type, ncol = 2)
 c_a_sharea_fac
 ggsave("c_a_sharea_fac.png")
+
+#Regression Result Charts
+city1_coefs <- ggplot(city1_results) +
+  geom_col(aes(x = reorder(term, estimate), y = estimate, fill = significance)) +
+  labs(
+    title = "Citywide Regression Results",
+    x = "term",
+    y = "coefficient",
+  ) +
+  theme_minimal()+
+  scale_fill_manual(
+    values = c("Signficant" = "#0072B2", "Not Significant" =  "#CC79A7"))
+city1_coefs
+ggsave("city1_coefs.png")
+
+demo_coefs <- ggplot(demo_results) +
+  geom_col(aes(x = reorder(term, estimate), y = estimate, fill = significance)) +
+  labs(
+    title = "Demographic Regression Results",
+    x = "term",
+    y = "coefficient",
+  ) +
+  theme_minimal()+
+  scale_fill_manual(
+    values = c("Signficant" = "#0072B2", "Not Significant" =  "#CC79A7"))
+demo_coefs
+ggsave("demo_coefs.png")
+
+both_coefs <- ggplot(both_results) +
+  geom_col(aes(x = reorder(term, estimate), y = estimate, fill = significance)) +
+  labs(
+    title = "Demographic and Precint Regression Results",
+    x = "term",
+    y = "coefficient",
+  ) +
+  theme_minimal()+
+  scale_fill_manual(
+    values = c("Signficant" = "#0072B2", "Not Significant" =  "#CC79A7"))
+both_coefs
+ggsave("both_coefs.png")
+
+pct_coefs <- ggplot(pctreg_results) +
+  geom_col(aes(x = reorder(term, estimate), y = estimate, fill = significance)) +
+  labs(
+    title = "Precinct Regression Results",
+    x = "term",
+    y = "coefficient",
+  ) +
+  theme_minimal()+
+  scale_fill_manual(
+    values = c("Signficant" = "#0072B2", "Not Significant" =  "#CC79A7"))
+pct_coefs
+ggsave("pct_coefs.png")
+
+bor_coefs<- ggplot(bor_results) +
+  geom_col(aes(x = reorder(term, estimate), y = estimate, fill = significance)) +
+  labs(
+    title = "Borough Regression Results",
+    x = "term",
+    y = "coefficient",
+  ) +
+  theme_minimal()+
+  scale_fill_manual(
+    values = c("Signficant" = "#0072B2", "Not Significant" =  "#CC79A7"))
+bor_coefs
+ggsave("bor_coefs.png")
+
+pctbor_coefs <- ggplot(pctbor_results) +
+  geom_col(aes(x = reorder(term, estimate), y = estimate, fill = significance)) +
+  labs(
+    title = "Precinct and Borough Regression Results",
+    x = "term",
+    y = "coefficient",
+  ) +
+  theme_minimal()+
+  scale_fill_manual(
+    values = c("Signficant" = "#0072B2", "Not Significant" =  "#CC79A7"))
+pctbor_coefs
+ggsave("pctbor_coefs.png")

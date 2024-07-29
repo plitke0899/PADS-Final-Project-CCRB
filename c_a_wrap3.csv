@@ -1,146 +1,141 @@
-"","disp_cat","rec_yr","type","alleg_count"
-"1","cleared",2017,"Abuse of Authority",1749
-"2","cleared",2017,"Discourtesy",123
-"3","cleared",2017,"Force",850
-"4","cleared",2017,"Offensive Language",41
-"5","cleared",2018,"Abuse of Authority",1968
-"6","cleared",2018,"Discourtesy",185
-"7","cleared",2018,"Force",766
-"8","cleared",2018,"Offensive Language",48
-"9","cleared",2019,"Abuse of Authority",2310
-"10","cleared",2019,"Discourtesy",273
-"11","cleared",2019,"Force",879
-"12","cleared",2019,"Offensive Language",39
-"13","cleared",2020,"Abuse of Authority",2491
-"14","cleared",2020,"Discourtesy",296
-"15","cleared",2020,"Force",1122
-"16","cleared",2020,"Offensive Language",28
-"17","cleared",2021,"Abuse of Authority",2674
-"18","cleared",2021,"Discourtesy",359
-"19","cleared",2021,"Force",1315
-"20","cleared",2021,"Offensive Language",58
-"21","cleared",2022,"Abuse of Authority",3032
-"22","cleared",2022,"Discourtesy",387
-"23","cleared",2022,"Force",1713
-"24","cleared",2022,"Offensive Language",59
-"25","cleared",2023,"Abuse of Authority",1699
-"26","cleared",2023,"Discourtesy",217
-"27","cleared",2023,"Force",820
-"28","cleared",2023,"Offensive Language",47
-"29","moot",2017,"Abuse of Authority",40
-"30","moot",2017,"Discourtesy",12
-"31","moot",2017,"Force",11
-"32","moot",2017,"Offensive Language",3
-"33","moot",2018,"Abuse of Authority",41
-"34","moot",2018,"Discourtesy",11
-"35","moot",2018,"Force",10
-"36","moot",2018,"Offensive Language",1
-"37","moot",2019,"Abuse of Authority",116
-"38","moot",2019,"Discourtesy",27
-"39","moot",2019,"Force",48
-"40","moot",2019,"Offensive Language",5
-"41","moot",2020,"Abuse of Authority",226
-"42","moot",2020,"Discourtesy",51
-"43","moot",2020,"Force",152
-"44","moot",2020,"Offensive Language",10
-"45","moot",2021,"Abuse of Authority",280
-"46","moot",2021,"Discourtesy",41
-"47","moot",2021,"Force",108
-"48","moot",2021,"Offensive Language",7
-"49","moot",2022,"Abuse of Authority",239
-"50","moot",2022,"Discourtesy",46
-"51","moot",2022,"Force",91
-"52","moot",2022,"Offensive Language",8
-"53","moot",2023,"Abuse of Authority",126
-"54","moot",2023,"Discourtesy",24
-"55","moot",2023,"Force",47
-"56","moot",2023,"Offensive Language",9
-"57","substantiated",2017,"Abuse of Authority",512
-"58","substantiated",2017,"Discourtesy",68
-"59","substantiated",2017,"Force",79
-"60","substantiated",2017,"Offensive Language",10
-"61","substantiated",2018,"Abuse of Authority",499
-"62","substantiated",2018,"Discourtesy",172
-"63","substantiated",2018,"Force",105
-"64","substantiated",2018,"Offensive Language",20
-"65","substantiated",2019,"Abuse of Authority",952
-"66","substantiated",2019,"Discourtesy",249
-"67","substantiated",2019,"Force",137
-"68","substantiated",2019,"Offensive Language",60
-"69","substantiated",2019,"Untruthful Statement",18
-"70","substantiated",2020,"Abuse of Authority",1062
-"71","substantiated",2020,"Discourtesy",338
-"72","substantiated",2020,"Force",274
-"73","substantiated",2020,"Offensive Language",57
-"74","substantiated",2020,"Untruthful Statement",71
-"75","substantiated",2021,"Abuse of Authority",1236
-"76","substantiated",2021,"Discourtesy",252
-"77","substantiated",2021,"Force",159
-"78","substantiated",2021,"Offensive Language",36
-"79","substantiated",2021,"Untruthful Statement",42
-"80","substantiated",2022,"Abuse of Authority",1419
-"81","substantiated",2022,"Discourtesy",311
-"82","substantiated",2022,"Force",132
-"83","substantiated",2022,"Offensive Language",49
-"84","substantiated",2022,"Untruthful Statement",25
-"85","substantiated",2023,"Abuse of Authority",662
-"86","substantiated",2023,"Discourtesy",127
-"87","substantiated",2023,"Force",56
-"88","substantiated",2023,"Offensive Language",30
-"89","substantiated",2023,"Untruthful Statement",7
-"90","truncated",2017,"Abuse of Authority",3750
-"91","truncated",2017,"Discourtesy",935
-"92","truncated",2017,"Force",1741
-"93","truncated",2017,"Offensive Language",229
-"94","truncated",2018,"Abuse of Authority",4771
-"95","truncated",2018,"Discourtesy",872
-"96","truncated",2018,"Force",2108
-"97","truncated",2018,"Offensive Language",187
-"98","truncated",2019,"Abuse of Authority",5612
-"99","truncated",2019,"Discourtesy",771
-"100","truncated",2019,"Force",2596
-"101","truncated",2019,"Offensive Language",183
-"102","truncated",2020,"Abuse of Authority",3448
-"103","truncated",2020,"Discourtesy",629
-"104","truncated",2020,"Force",2083
-"105","truncated",2020,"Offensive Language",172
-"106","truncated",2021,"Abuse of Authority",2562
-"107","truncated",2021,"Discourtesy",423
-"108","truncated",2021,"Force",1539
-"109","truncated",2021,"Offensive Language",140
-"110","truncated",2022,"Abuse of Authority",2396
-"111","truncated",2022,"Discourtesy",390
-"112","truncated",2022,"Force",1663
-"113","truncated",2022,"Offensive Language",135
-"114","truncated",2023,"Abuse of Authority",3841
-"115","truncated",2023,"Discourtesy",548
-"116","truncated",2023,"Force",2652
-"117","truncated",2023,"Offensive Language",106
-"118","uncertain",2017,"Abuse of Authority",1644
-"119","uncertain",2017,"Discourtesy",626
-"120","uncertain",2017,"Force",554
-"121","uncertain",2017,"Offensive Language",129
-"122","uncertain",2018,"Abuse of Authority",1410
-"123","uncertain",2018,"Discourtesy",412
-"124","uncertain",2018,"Force",472
-"125","uncertain",2018,"Offensive Language",104
-"126","uncertain",2019,"Abuse of Authority",1597
-"127","uncertain",2019,"Discourtesy",332
-"128","uncertain",2019,"Force",409
-"129","uncertain",2019,"Offensive Language",92
-"130","uncertain",2020,"Abuse of Authority",1508
-"131","uncertain",2020,"Discourtesy",287
-"132","uncertain",2020,"Force",488
-"133","uncertain",2020,"Offensive Language",86
-"134","uncertain",2021,"Abuse of Authority",1197
-"135","uncertain",2021,"Discourtesy",295
-"136","uncertain",2021,"Force",279
-"137","uncertain",2021,"Offensive Language",83
-"138","uncertain",2022,"Abuse of Authority",1231
-"139","uncertain",2022,"Discourtesy",338
-"140","uncertain",2022,"Force",311
-"141","uncertain",2022,"Offensive Language",68
-"142","uncertain",2023,"Abuse of Authority",474
-"143","uncertain",2023,"Discourtesy",152
-"144","uncertain",2023,"Force",129
-"145","uncertain",2023,"Offensive Language",36
+"","rec_yr","disp_cat","type","alleg_count"
+"1",2017,"cleared","Abuse of Authority",1749
+"2",2017,"cleared","Discourtesy",123
+"3",2017,"cleared","Force",850
+"4",2017,"cleared","Offensive Language",41
+"5",2017,"moot","Abuse of Authority",40
+"6",2017,"moot","Discourtesy",12
+"7",2017,"moot","Force",11
+"8",2017,"moot","Offensive Language",3
+"9",2017,"substantiated","Abuse of Authority",512
+"10",2017,"substantiated","Discourtesy",68
+"11",2017,"substantiated","Force",79
+"12",2017,"substantiated","Offensive Language",10
+"13",2017,"truncated","Abuse of Authority",3750
+"14",2017,"truncated","Discourtesy",935
+"15",2017,"truncated","Force",1741
+"16",2017,"truncated","Offensive Language",229
+"17",2017,"uncertain","Abuse of Authority",1644
+"18",2017,"uncertain","Discourtesy",626
+"19",2017,"uncertain","Force",554
+"20",2017,"uncertain","Offensive Language",129
+"21",2018,"cleared","Abuse of Authority",1968
+"22",2018,"cleared","Discourtesy",185
+"23",2018,"cleared","Force",766
+"24",2018,"cleared","Offensive Language",48
+"25",2018,"moot","Abuse of Authority",41
+"26",2018,"moot","Discourtesy",11
+"27",2018,"moot","Force",10
+"28",2018,"moot","Offensive Language",1
+"29",2018,"substantiated","Abuse of Authority",499
+"30",2018,"substantiated","Discourtesy",172
+"31",2018,"substantiated","Force",105
+"32",2018,"substantiated","Offensive Language",20
+"33",2018,"truncated","Abuse of Authority",4771
+"34",2018,"truncated","Discourtesy",872
+"35",2018,"truncated","Force",2108
+"36",2018,"truncated","Offensive Language",187
+"37",2018,"uncertain","Abuse of Authority",1410
+"38",2018,"uncertain","Discourtesy",412
+"39",2018,"uncertain","Force",472
+"40",2018,"uncertain","Offensive Language",104
+"41",2019,"cleared","Abuse of Authority",2310
+"42",2019,"cleared","Discourtesy",273
+"43",2019,"cleared","Force",879
+"44",2019,"cleared","Offensive Language",39
+"45",2019,"moot","Abuse of Authority",116
+"46",2019,"moot","Discourtesy",27
+"47",2019,"moot","Force",48
+"48",2019,"moot","Offensive Language",5
+"49",2019,"substantiated","Abuse of Authority",952
+"50",2019,"substantiated","Discourtesy",249
+"51",2019,"substantiated","Force",137
+"52",2019,"substantiated","Offensive Language",60
+"53",2019,"truncated","Abuse of Authority",5612
+"54",2019,"truncated","Discourtesy",771
+"55",2019,"truncated","Force",2596
+"56",2019,"truncated","Offensive Language",183
+"57",2019,"uncertain","Abuse of Authority",1597
+"58",2019,"uncertain","Discourtesy",332
+"59",2019,"uncertain","Force",409
+"60",2019,"uncertain","Offensive Language",92
+"61",2020,"cleared","Abuse of Authority",2491
+"62",2020,"cleared","Discourtesy",296
+"63",2020,"cleared","Force",1122
+"64",2020,"cleared","Offensive Language",28
+"65",2020,"moot","Abuse of Authority",226
+"66",2020,"moot","Discourtesy",51
+"67",2020,"moot","Force",152
+"68",2020,"moot","Offensive Language",10
+"69",2020,"substantiated","Abuse of Authority",1062
+"70",2020,"substantiated","Discourtesy",338
+"71",2020,"substantiated","Force",274
+"72",2020,"substantiated","Offensive Language",57
+"73",2020,"truncated","Abuse of Authority",3448
+"74",2020,"truncated","Discourtesy",629
+"75",2020,"truncated","Force",2083
+"76",2020,"truncated","Offensive Language",172
+"77",2020,"uncertain","Abuse of Authority",1508
+"78",2020,"uncertain","Discourtesy",287
+"79",2020,"uncertain","Force",488
+"80",2020,"uncertain","Offensive Language",86
+"81",2021,"cleared","Abuse of Authority",2674
+"82",2021,"cleared","Discourtesy",359
+"83",2021,"cleared","Force",1315
+"84",2021,"cleared","Offensive Language",58
+"85",2021,"moot","Abuse of Authority",280
+"86",2021,"moot","Discourtesy",41
+"87",2021,"moot","Force",108
+"88",2021,"moot","Offensive Language",7
+"89",2021,"substantiated","Abuse of Authority",1236
+"90",2021,"substantiated","Discourtesy",252
+"91",2021,"substantiated","Force",159
+"92",2021,"substantiated","Offensive Language",36
+"93",2021,"truncated","Abuse of Authority",2562
+"94",2021,"truncated","Discourtesy",423
+"95",2021,"truncated","Force",1539
+"96",2021,"truncated","Offensive Language",140
+"97",2021,"uncertain","Abuse of Authority",1197
+"98",2021,"uncertain","Discourtesy",295
+"99",2021,"uncertain","Force",279
+"100",2021,"uncertain","Offensive Language",83
+"101",2022,"cleared","Abuse of Authority",3032
+"102",2022,"cleared","Discourtesy",387
+"103",2022,"cleared","Force",1713
+"104",2022,"cleared","Offensive Language",59
+"105",2022,"moot","Abuse of Authority",239
+"106",2022,"moot","Discourtesy",46
+"107",2022,"moot","Force",91
+"108",2022,"moot","Offensive Language",8
+"109",2022,"substantiated","Abuse of Authority",1419
+"110",2022,"substantiated","Discourtesy",311
+"111",2022,"substantiated","Force",132
+"112",2022,"substantiated","Offensive Language",49
+"113",2022,"truncated","Abuse of Authority",2396
+"114",2022,"truncated","Discourtesy",390
+"115",2022,"truncated","Force",1663
+"116",2022,"truncated","Offensive Language",135
+"117",2022,"uncertain","Abuse of Authority",1231
+"118",2022,"uncertain","Discourtesy",338
+"119",2022,"uncertain","Force",311
+"120",2022,"uncertain","Offensive Language",68
+"121",2023,"cleared","Abuse of Authority",1699
+"122",2023,"cleared","Discourtesy",217
+"123",2023,"cleared","Force",820
+"124",2023,"cleared","Offensive Language",47
+"125",2023,"moot","Abuse of Authority",126
+"126",2023,"moot","Discourtesy",24
+"127",2023,"moot","Force",47
+"128",2023,"moot","Offensive Language",9
+"129",2023,"substantiated","Abuse of Authority",662
+"130",2023,"substantiated","Discourtesy",127
+"131",2023,"substantiated","Force",56
+"132",2023,"substantiated","Offensive Language",30
+"133",2023,"truncated","Abuse of Authority",3841
+"134",2023,"truncated","Discourtesy",548
+"135",2023,"truncated","Force",2652
+"136",2023,"truncated","Offensive Language",106
+"137",2023,"uncertain","Abuse of Authority",474
+"138",2023,"uncertain","Discourtesy",152
+"139",2023,"uncertain","Force",129
+"140",2023,"uncertain","Offensive Language",36
